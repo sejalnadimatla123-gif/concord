@@ -1,8 +1,9 @@
 from core.agents.base import BaseAgent
 from core.agents.result import AgentResult
+from core.topologies.base import BaseTopology
 
 
-class SoloTopology:
+class SoloTopology(BaseTopology):
     """Executes a task using a single agent."""
 
     def __init__(self, agent: BaseAgent):
