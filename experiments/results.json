@@ -1,0 +1,40 @@
+{
+  "experiment": "initial_solo_vs_debate",
+  "status": "preliminary",
+  "notes": "One observed run per topology on the same arithmetic task using Gemini 2.5 Flash. Not a statistically reliable benchmark.",
+  "task": "What is 25 * 17? Explain the calculation briefly.",
+  "model": "gemini-2.5-flash",
+  "runs": [
+    {
+      "topology": "solo",
+      "llm_calls": 1,
+      "correct": true,
+      "latency_seconds": 3.182175900088623,
+      "prompt_tokens": 16,
+      "completion_tokens": 421,
+      "total_tokens": 437,
+      "reported_cost_usd": 0.0010573
+    },
+    {
+      "topology": "debate",
+      "llm_calls": 5,
+      "correct": true,
+      "latency_seconds": 42.79468990000896,
+      "prompt_tokens": 2010,
+      "completion_tokens": 8038,
+      "total_tokens": 10048,
+      "reported_cost_usd": 0.020698
+    },
+    {
+      "topology": "solo",
+      "task": "What is 25 * 17? Explain the calculation briefly.",
+      "llm_calls": 1,
+      "answer": "25 * 17 = **425**\n\nHere's a brief explanation:\n\nYou can break down 17 into 10 + 7:\n1.  **25 * 10 = 250**\n2.  **25 * 7 = 175**\n3.  Add the results: **250 + 175 = 425**",
+      "latency": 3.4467861000448465,
+      "prompt_tokens": 16,
+      "completion_tokens": 459,
+      "total_tokens": 475,
+      "cost": 0.0011523
+    }
+  ]
+}
