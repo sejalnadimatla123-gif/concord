@@ -112,6 +112,18 @@ class ManagerWorkerTopology(BaseTopology):
             else None
         )
 
+        call_records = []
+
+        for result, stage in [
+            (planning_result, "planning"),
+            *[(result, "worker") for result in worker_results],
+            (final_result, "synthesis"),
+        ]:
+            for record in result.call_records:
+                call_records.append(
+                    record.model_copy(update={"stage": stage})
+                )
+
         return AgentResult(
             answer=final_result.answer,
             latency=time.perf_counter() - start_time,
@@ -119,6 +131,8 @@ class ManagerWorkerTopology(BaseTopology):
             completion_tokens=sum(r.completion_tokens for r in all_results),
             total_tokens=sum(r.total_tokens for r in all_results),
             cost=total_cost,
+            call_records=call_records,
         )
+
 
 

@@ -6,6 +6,7 @@ import pytest
 from core.agents.result import AgentResult
 from core.models import TaskPlan
 from core.topologies.manager_worker import ManagerWorkerTopology
+from core.agents.result import AgentResult, LLMCallRecord
 
 
 class MockAgent:
@@ -22,6 +23,17 @@ class MockAgent:
             completion_tokens=5,
             total_tokens=15,
             cost=0.001,
+            call_records=[
+                LLMCallRecord(
+                    stage="agent",
+                    model="test-model",
+                    latency=0.1,
+                    prompt_tokens=10,
+                    completion_tokens=5,
+                    total_tokens=15,
+                    cost=0.001,
+                )
+            ],
         )
 
 
@@ -48,6 +60,13 @@ async def test_manager_worker_aggregates_metrics():
     assert result.total_tokens == 60
     assert result.cost == pytest.approx(0.004)
     assert result.latency >= 0
+    assert len(result.call_records) == 4
+    assert [record.stage for record in result.call_records] == [
+        "planning",
+        "worker",
+        "worker",
+        "synthesis",
+    ]
 
 
 
