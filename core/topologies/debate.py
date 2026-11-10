@@ -74,6 +74,20 @@ class DebateTopology(BaseTopology):
             else None
         )
 
+        call_records = []
+
+        for result, stage in [
+            (proposal_a, "proposal_a"),
+            (proposal_b, "proposal_b"),
+            (review_a, "review_a"),
+            (review_b, "review_b"),
+            (final_result, "judge"),
+        ]:
+            for record in result.call_records:
+                call_records.append(
+                    record.model_copy(update={"stage": stage})
+                )
+
         return AgentResult(
             answer=final_result.answer,
             latency=time.perf_counter() - start_time,
@@ -81,4 +95,5 @@ class DebateTopology(BaseTopology):
             completion_tokens=sum(r.completion_tokens for r in results),
             total_tokens=sum(r.total_tokens for r in results),
             cost=total_cost,
+            call_records=call_records,
         )

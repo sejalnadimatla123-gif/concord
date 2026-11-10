@@ -31,6 +31,17 @@ class ReflectTopology(BaseTopology):
         # Measure total elapsed time across both calls.
         latency = time.perf_counter() - start_time
 
+        call_records = []
+
+        for result, stage in [
+            (initial_result, "initial_answer"),
+            (reflected_result, "reflection"),
+        ]:
+            for record in result.call_records:
+                call_records.append(
+                    record.model_copy(update={"stage": stage})
+                )
+
         return AgentResult(
             answer=reflected_result.answer,
             latency=latency,
@@ -52,4 +63,5 @@ class ReflectTopology(BaseTopology):
                 and reflected_result.cost is not None
                 else None
             ),
+            call_records=call_records,
         )

@@ -3,6 +3,7 @@ import pytest
 from core.agents.base import BaseAgent
 from core.agents.result import AgentResult
 from core.topologies.reflect import ReflectTopology
+from core.agents.result import AgentResult, LLMCallRecord
 
 
 class MockAgent(BaseAgent):
@@ -20,6 +21,18 @@ class MockAgent(BaseAgent):
                 completion_tokens=5,
                 total_tokens=15,
                 cost=0.001,
+                call_records=[
+
+                LLMCallRecord(
+                stage="agent",
+                model="test-model",
+                latency=0.01,
+                prompt_tokens=10,
+                completion_tokens=5,
+                total_tokens=15,
+                cost=0.001,
+    )
+],
             )
 
         return AgentResult(
@@ -29,6 +42,17 @@ class MockAgent(BaseAgent):
             completion_tokens=10,
             total_tokens=30,
             cost=0.002,
+            call_records=[
+    LLMCallRecord(
+        stage="agent",
+        model="test-model",
+        latency=0.02,
+        prompt_tokens=20,
+        completion_tokens=10,
+        total_tokens=30,
+        cost=0.002,
+    )
+],
         )
 
 
@@ -57,6 +81,15 @@ async def test_reflect_aggregates_metrics():
     assert result.total_tokens == 45
     assert result.cost == pytest.approx(0.003)
     assert result.latency > 0
+    assert len(result.call_records) == 2
+
+    assert [record.stage for record in result.call_records] == [
+        "initial_answer",
+        "reflection",
+    ]
+
+    assert result.call_records[0].total_tokens == 15
+    assert result.call_records[1].total_tokens == 30
 
 
 

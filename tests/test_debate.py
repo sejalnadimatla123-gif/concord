@@ -4,9 +4,10 @@ import pytest
 from core.agents.base import BaseAgent
 from core.agents.result import AgentResult
 from core.topologies.debate import DebateTopology
+from core.agents.result import AgentResult , LLMCallRecord
 
 
-def make_result(answer: str, cost: float = 0.001) -> AgentResult:
+def make_result(answer: str, cost: float | None = 0.001) -> AgentResult:
     return AgentResult(
         answer=answer,
         latency=0.01,
@@ -14,6 +15,17 @@ def make_result(answer: str, cost: float = 0.001) -> AgentResult:
         completion_tokens=5,
         total_tokens=15,
         cost=cost,
+        call_records=[
+            LLMCallRecord(
+                stage="agent",
+                model="test-model",
+                latency=0.01,
+                prompt_tokens=10,
+                completion_tokens=5,
+                total_tokens=15,
+                cost=cost,
+            )
+        ],
     )
 
 
@@ -64,6 +76,17 @@ async def test_debate_aggregates_metrics():
     assert result.total_tokens == 75
     assert result.cost == pytest.approx(0.005)
     assert result.latency > 0
+    assert len(result.call_records) == 5
+
+    assert [record.stage for record in result.call_records] == [
+        "proposal_a",
+        "proposal_b",
+        "review_a",
+        "review_b",
+        "judge",
+    ]
+
+    assert all(record.total_tokens == 15 for record in result.call_records)
 
 
 @pytest.mark.asyncio
